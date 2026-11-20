@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cyber Notice</title>
+<style>
+:root{--bg:#050607;--panel:#0b0f0d;--red:#ff2a2a;--green:#38ff7a;--amber:#ffb020;--text:#cfe9d8;--dim:#6b8575;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Share Tech Mono","Courier New",monospace;min-height:100vh;overflow-x:hidden}
+#rain{position:fixed;inset:0;width:100%;height:100%;opacity:.28;z-index:0}
+body::after{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 1px,transparent 1px 3px);pointer-events:none;z-index:5}
+#flash{position:fixed;inset:0;background:var(--red);opacity:0;pointer-events:none;z-index:4}
+.alarm #flash{animation:flash 1s steps(1) infinite}
+@keyframes flash{0%{opacity:.18}50%{opacity:0}}
+#start{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--bg);text-align:center;padding:24px}
+#start button{font:inherit;font-size:18px;color:var(--green);background:transparent;border:1px solid var(--green);padding:14px 28px;cursor:pointer;letter-spacing:.08em}
+#start button:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+#start p{margin:0;color:var(--dim);font-size:14px}
+main{position:relative;z-index:2;max-width:760px;margin:0 auto;padding:20px 16px 60px;display:none}
+.top{display:flex;align-items:center;gap:14px;border-bottom:1px solid #2a3a30;padding-bottom:14px}
+.logo{width:58px;height:58px;flex:none;filter:drop-shadow(0 0 8px rgba(255,42,42,.7))}
+.logo .ring{animation:pulse 1.2s ease-in-out infinite;transform-origin:center}
+@keyframes pulse{50%{opacity:.35}}
+.brand b{display:block;font-size:20px;color:#fff;letter-spacing:.04em}
+.brand span{font-size:12px;color:var(--dim)}
+.status{margin-left:auto;text-align:right;font-size:12px;color:var(--red)}
+.status i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:6px;animation:pulse .8s infinite}
+#log{margin:16px 0;padding:12px;background:var(--panel);border:1px solid #1d2b23;font-size:13px;line-height:1.7;color:var(--green);min-height:150px}
+#log div{white-space:pre-wrap;word-break:break-word}
+#log .w{color:var(--amber)}#log .e{color:var(--red)}
+.card{display:none;margin-top:16px;border:1px solid var(--red);background:rgba(255,42,42,.06);padding:18px;box-shadow:0 0 24px rgba(255,42,42,.25)}
+.card.final{border-color:var(--amber);background:rgba(255,176,32,.07);box-shadow:0 0 24px rgba(255,176,32,.25)}
+.card h1{margin:0 0 6px;font-size:21px;color:var(--red);line-height:1.3;letter-spacing:.03em}
+.card.final h1{color:var(--amber)}
+.card .who{margin:0 0 14px;color:#fff;font-size:16px}
+.card p{margin:0 0 12px;line-height:1.65;font-size:15px;max-width:68ch}
+.card .tag{margin-top:16px;padding:12px;border:1px dashed var(--red);color:#fff;font-size:14px;line-height:1.5}
+.card.final .tag{border-color:var(--amber)}
+#timer{display:block;font-size:44px;color:var(--amber);margin:6px 0 4px;text-shadow:0 0 12px rgba(255,176,32,.6)}
+.cursor::after{content:"▌";animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.glitch{animation:glitch .25s steps(2) 2}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(-4px,2px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-2px,-3px)}100%{transform:translate(0)}}
+#replay{margin-top:22px;font:inherit;color:var(--dim);background:transparent;border:1px solid #2a3a30;padding:10px 16px;cursor:pointer;display:none}
+@media (prefers-reduced-motion:reduce){.alarm #flash,.glitch,.logo .ring,.status i{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div id="flash"></div>
+<div style="position:fixed;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:30;font-size:10px;letter-spacing:.12em;color:#8fa898;border:1px solid #2a3a30;background:rgba(5,6,7,.8);padding:3px 7px">PROP · FICTIONAL</div>
+
+
+<div id="start">
+  <button id="go" type="button">Open</button>
+</div>
+
+<main id="app">
+  <div class="top">
+    <svg class="logo" viewBox="0 0 64 64" aria-label="Logo">
+      <path class="ring" d="M32 3 58 14v17c0 15-11 26-26 31C17 57 6 46 6 31V14z" fill="#1a0505" stroke="#ff2a2a" stroke-width="3"/>
+      <path d="M32 12 50 20v11c0 10-7 18-18 22-11-4-18-12-18-22V20z" fill="none" stroke="#ff2a2a" stroke-width="1.5" opacity=".6"/>
+      <rect x="29.5" y="19" width="5" height="19" rx="2" fill="#ff2a2a"/>
+      <circle cx="32" cy="44.5" r="3" fill="#ff2a2a"/>
+    </svg>
+    <div class="brand"><b>CYBER SHIELD</b><span>Online Safety Monitoring Unit</span></div>
+    <div class="status"><i></i>ACTIVE<br>TRACE</div>
+  </div>
+
+  <div id="log" aria-live="polite"></div>
+
+  <section class="card" id="c1">
+    <h1>⚠️ CYBERSECURITY NOTICE — UNKNOWN ACCOUNT</h1>
+    <p class="who">Hello "Dump ni John Culcog"</p>
+    <p>The use of a dump or fake account does not guarantee anonymity or immunity from accountability. Online interactions may leave digital footprints, and suspicious activity can be documented and reported.</p>
+    <p>The account owner is advised to respect personal boundaries and refrain from unwanted contact. Continued harassment, suspicious links, impersonation, or attempts to obtain private information may result in reports to the platform and further appropriate action.</p>
+    <p>This notice serves as a warning to exercise responsible online behavior. Digital privacy is a right, but it does not justify violating the privacy of others.</p>
+    <p><b style="color:var(--red)">FINAL NOTICE:</b> Cease unwanted contact and respect the individual's privacy. Further incidents may be documented and reported through the proper channels.</p>
+    <div class="tag">🔒 STAY ANONYMOUS IF YOU CHOOSE, BUT NEVER USE ANONYMITY AS AN EXCUSE TO HARASS OTHERS.</div>
+  </section>
+
+  <section class="card final" id="c2">
+    <h1>🚨 FINAL WARNING</h1>
+    <p>You are required to identify yourself immediately. Failure to comply will result in the immediate deactivation of your account without further notice.</p>
+    <span id="timer">48:00:00</span>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var AC=null, master=null, sirenNodes=null, timers=[], cd=null;
+  var $=function(i){return document.getElementById(i)};
+  function T(fn,ms){var t=setTimeout(fn,ms);timers.push(t);return t}
+
+  /* Matrix rain */
+  var cv=$('rain'),cx=cv.getContext('2d'),cols,drops;
+  function size(){cv.width=innerWidth;cv.height=innerHeight;cols=Math.floor(cv.width/16);drops=[];for(var i=0;i<cols;i++)drops[i]=Math.random()*cv.height/16}
+  size();addEventListener('resize',size);
+  var chars='01ABCDEF<>/\\{}#$%&*';
+  setInterval(function(){
+    cx.fillStyle='rgba(5,6,7,.12)';cx.fillRect(0,0,cv.width,cv.height);
+    cx.font='14px monospace';
+    for(var i=0;i<cols;i++){
+      cx.fillStyle=document.body.classList.contains('alarm')?'#ff2a2a':'#38ff7a';
+      cx.fillText(chars[Math.floor(Math.random()*chars.length)],i*16,drops[i]*16);
+      if(drops[i]*16>cv.height&&Math.random()>.975)drops[i]=0;
+      drops[i]++;
+    }
+  },60);
+
+  /* Sound (WebAudio, no files) */
+  function audio(){
+    if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.5;master.connect(AC.destination)}
+    if(AC.state==='suspended')AC.resume();
+  }
+  function beep(f,d,type,v,when){
+    if(!AC||AC.state!=='running')return;var t=AC.currentTime+(when||0);
+    var o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||'square';o.frequency.value=f;
+    g.gain.setValueAtTime(v||.15,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02);
+  }
+  function typeBlip(){beep(1200+Math.random()*600,.03,'square',.04)}
+  function warnTone(){beep(880,.18,'square',.2);beep(660,.18,'square',.2,.2);beep(880,.18,'square',.2,.4)}
+  function glitchSnd(){for(var i=0;i<6;i++)beep(100+Math.random()*1800,.05,'sawtooth',.12,i*.05)}
+  function startSiren(){
+    if(!AC||sirenNodes)return;
+    var o=AC.createOscillator(),l=AC.createOscillator(),lg=AC.createGain(),g=AC.createGain();
+    o.type='sawtooth';o.frequency.value=720;l.frequency.value=1.4;lg.gain.value=260;
+    l.connect(lg);lg.connect(o.frequency);g.gain.value=.09;o.connect(g);g.connect(master);
+    o.start();l.start();sirenNodes=[o,l,g];
+  }
+  function stopSiren(){if(sirenNodes){try{sirenNodes[0].stop();sirenNodes[1].stop()}catch(e){}sirenNodes=null}}
+  function tick(){beep(1500,.05,'square',.12)}
+
+  /* Log typing */
+  var log=$('log');
+  function line(txt,cls,cb){
+    var d=document.createElement('div');if(cls)d.className=cls;log.appendChild(d);
+    var i=0;(function step(){
+      if(i<=txt.length){d.textContent='> '+txt.slice(0,i);if(i%2===0)typeBlip();i++;T(step,16)}
+      else if(cb)T(cb,140);
+    })();
+  }
+  function seq(list,done){
+    var k=0;(function next(){
+      if(k>=list.length){if(done)done();return}
+      var it=list[k++];line(it[0],it[1],next);
+    })();
+  }
+
+  /* Card typing */
+  function typeCard(el,cb){
+    el.style.display='block';
+    var nodes=[].slice.call(el.querySelectorAll('h1,p,.tag')),k=0;
+    nodes.forEach(function(n){n.dataset.t=n.innerHTML;n.style.visibility='hidden'});
+    (function next(){
+      if(k>=nodes.length){if(cb)cb();return}
+      var n=nodes[k++],html=n.dataset.t,tmp=document.createElement('div');tmp.innerHTML=html;
+      var plain=tmp.textContent.length;n.style.visibility='visible';
+      var i=0;n.classList.add('cursor');
+      (function step(){
+        i+=3;
+        if(i>=plain){n.innerHTML=html;n.classList.remove('cursor');T(next,150);return}
+        n.textContent=tmp.textContent.slice(0,i);typeBlip();T(step,18);
+      })();
+    })();
+  }
+
+  function run(){
+    $('start').style.display='none';$('app').style.display='block';
+    log.innerHTML='';$('c1').style.display='none';$('c2').style.display='none';
+    document.body.classList.remove('alarm');
+    seq([
+      ['Initializing secure channel...'],
+      ['Scanning network activity...'],
+      ['Checking digital footprints...','w'],
+      ['Unknown account detected','e']
+    ],function(){
+      document.body.classList.add('alarm');document.body.classList.add('glitch');
+      glitchSnd();warnTone();startSiren();
+      T(function(){document.body.classList.remove('glitch')},600);
+      typeCard($('c1'),function(){
+        T(function(){
+          glitchSnd();warnTone();
+          seq([['Tracing source...','w'],['Identity verification required','e']],function(){
+            typeCard($('c2'),function(){countdown()});
+          });
+        },1800);
+      });
+    });
+  }
+
+  function countdown(){
+    var s=172800,el=$('timer');
+    cd=setInterval(function(){
+      s--;if(s<0){clearInterval(cd);el.textContent='00:00:00';glitchSnd();return}
+      var p=function(n){return (n<10?'0':'')+n};el.textContent=p(Math.floor(s/3600))+':'+p(Math.floor(s%3600/60))+':'+p(s%60);tick();
+      if(s<=10)beep(600,.1,'square',.12);
+    },1000);
+  }
+
+  function reset(){
+    timers.forEach(clearTimeout);timers=[];clearInterval(cd);stopSiren();
+    $('timer').textContent='48:00:00';
+    run();
+  }
+
+  $('go').addEventListener('click',function(){audio();run()});
+})();
+</script>
+</body>
+</html>
